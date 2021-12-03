@@ -8,14 +8,17 @@ val instructions = File("src/main/kotlin/day02/input.txt")
     .map { it.first() to it.last().toInt() }
 
 data class Coordinate(val X: Int, val Y: Int)
-data class State(val Coordinate:Coordinate, val Aim: Int)
+data class State(val Coordinate: Coordinate, val Aim: Int)
 
 fun parseInstruction(instruction: Pair<String, Int>, current: State): State {
     val (direction, distance) = instruction
     return when (direction) {
-        "forward" -> State(Coordinate(current.Coordinate.X + distance, current.Coordinate.Y + (current.Aim * distance)), current.Aim)
-        "up" -> State(Coordinate(current.Coordinate.X, current.Coordinate.Y), current.Aim - distance)
-        "down" -> State(Coordinate(current.Coordinate.X, current.Coordinate.Y), current.Aim + distance)
+        "forward" -> State(
+            Coordinate(current.Coordinate.X + distance, current.Coordinate.Y + (current.Aim * distance)),
+            current.Aim
+        )
+        "up" -> State( current.Coordinate, current.Aim - distance )
+        "down" -> State( current.Coordinate, current.Aim + distance )
         else -> throw IllegalArgumentException(direction)
     }
 }
