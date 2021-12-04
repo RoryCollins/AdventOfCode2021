@@ -2,11 +2,11 @@ package day04
 
 import java.io.File
 
-val input = File("src/main/kotlin/day04/input.txt")
-    .readText()
-    .split("\n\n", "\r\n\r\n")
-
 fun main() {
+    val input = File("src/main/kotlin/day04/input.txt")
+        .readText()
+        .split("\n\n", "\r\n\r\n")
+
     val sequence = input.first().split(",").map { it.toInt() }
     val boards = input.drop(1).map(Board::parse)
     val completeBoards = mutableListOf<Pair<Board, Int>>()
