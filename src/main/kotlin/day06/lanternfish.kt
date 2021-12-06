@@ -15,7 +15,7 @@ private fun advanceDay(population: Map<Int, Long>): Map<Int, Long> {
             pop[6] = pop.getOrDefault(6, 0) + fish.value
         } else pop[fish.key - 1] = pop.getOrDefault(fish.key - 1, 0) + fish.value
     }
-    return pop.toMap()
+    return pop
 }
 
 private fun getPopulationSizeAfterDays(initialPopulation: Map<Int, Long>, days: Int) =
