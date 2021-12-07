@@ -16,8 +16,11 @@ fun main() {
         .split(",")
         .map { it.toInt() }
 
-    val partOneFuelCalculation = {target:Int, current:Int -> abs(current - target)}
-    val partTwoFuelCalculation = {target:Int, current:Int -> (1..abs(current - target)).sum()}
+    val partOneFuelCalculation = { target: Int, current: Int -> abs(current - target) }
+    val partTwoFuelCalculation = { target: Int, current: Int ->
+        val n = abs(current - target)
+        (n * (n + 1) / 2)
+    }
 
     println("Part One: ${getFuelExpense(positions, partOneFuelCalculation, positions.minOf { it }, Int.MAX_VALUE)}")
     println("Part Two: ${getFuelExpense(positions, partTwoFuelCalculation, positions.minOf { it }, Int.MAX_VALUE)}")
