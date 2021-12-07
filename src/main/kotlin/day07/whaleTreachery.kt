@@ -3,19 +3,23 @@ package day07
 import java.io.File
 import kotlin.math.abs
 
-val positions = File("src/main/kotlin/day07/input_test.txt")
-    .readText()
-    .split(",")
-    .map { it.toInt() }
+
+fun getFuelExpense(positions: List<Int>, fuelCalculation: (Int, Int) -> Int, target: Int, previousTotal: Int): Int {
+    val fuelExpense = positions.sumOf { fuelCalculation(target, it) }
+    return if (fuelExpense > previousTotal) previousTotal
+    else getFuelExpense(positions, fuelCalculation, target + 1, fuelExpense)
+}
 
 fun main() {
-    val partOne = (positions.minOf { it }..positions.maxOf { it }).map { target ->
-        target to positions.sumOf { abs(it - target) }
-    }
-    val partTwo = (positions.minOf { it }..positions.maxOf { it }).map { target ->
-        target to positions.sumOf { (1..abs(it - target)).sum() }
-    }
+    val positions = File("src/main/kotlin/day07/input.txt")
+        .readText()
+        .split(",")
+        .map { it.toInt() }
 
-    println("Part One: ${partOne.minOf { it.second }}")
-    println("Part Two: ${partTwo.minOf { it.second }}")
+    val partOneFuelCalculation = {target:Int, current:Int -> abs(current - target)}
+    val partTwoFuelCalculation = {target:Int, current:Int -> (1..abs(current - target)).sum()}
+
+    println("Part One: ${getFuelExpense(positions, partOneFuelCalculation, positions.minOf { it }, Int.MAX_VALUE)}")
+    println("Part Two: ${getFuelExpense(positions, partTwoFuelCalculation, positions.minOf { it }, Int.MAX_VALUE)}")
+
 }
