@@ -8,15 +8,15 @@ val lanternfish = File("src/main/kotlin/day06/input.txt")
     .map { it.toInt() }
 
 private fun advanceDay(population: Map<Int, Long>): Map<Int, Long> {
-    val pop = mutableMapOf<Int, Long>()
+    val nextDayPopulation = mutableMapOf<Int, Long>()
     for (fish in population) {
         val (timer, count) = fish
         if (timer == 0) {
-            pop[8] = count
-            pop[6] = pop.getOrDefault(6, 0) + count
-        } else pop[timer - 1] = pop.getOrDefault(timer -1, 0) + count
+            nextDayPopulation[8] = count
+            nextDayPopulation[6] = nextDayPopulation.getOrDefault(6, 0) + count
+        } else nextDayPopulation[timer - 1] = nextDayPopulation.getOrDefault(timer -1, 0) + count
     }
-    return pop
+    return nextDayPopulation
 }
 
 private fun getPopulationSizeAfterDays(initialPopulation: Map<Int, Long>, days: Int) =
