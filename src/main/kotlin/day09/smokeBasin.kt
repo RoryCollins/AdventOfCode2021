@@ -9,7 +9,7 @@ data class Coordinate(val X: Int, val Y: Int) {
     fun left(): Coordinate = Coordinate(X - 1, Y)
 }
 
-class Grid(private val rows: List<List<Int>>) {
+class HeightMap(private val rows: List<List<Int>>) {
     private val lowPoints = rows.indices.flatMap { y ->
         rows.first().indices
             .filter { x -> getNeighbours(Coordinate(x, y)).all { rows[it.Y][it.X] > rows[y][x] } }
@@ -48,10 +48,10 @@ fun main() {
         .readLines()
         .map { line -> line.map { Character.getNumericValue(it) } }
 
-    val grid = Grid(rows)
+    val heightMap = HeightMap(rows)
 
-    println("Part One: ${grid.lowPointRisk}")
-    println("Part Two: ${grid.basinSizesDescending
+    println("Part One: ${heightMap.lowPointRisk}")
+    println("Part Two: ${heightMap.basinSizesDescending
             .take(3)
             .fold(1) { a, b -> a * b }
     }")
