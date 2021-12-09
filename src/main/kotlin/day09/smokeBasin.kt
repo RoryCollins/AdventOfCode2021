@@ -22,9 +22,9 @@ class Grid(private val rows: List<List<Int>>) {
         .map{(coordinate, _) -> getBasin(setOf(coordinate)).size}
         .sortedDescending()
 
-    private fun getBasin(acc: Set<Coordinate>): Set<Coordinate> {
-        val next = acc + acc.flatMap { getNeighbours(it) }.filter { rows[it.Y][it.X] != 9 }
-        return if (next.size == acc.size) acc
+    private fun getBasin(current: Set<Coordinate>): Set<Coordinate> {
+        val next = current + current.flatMap { getNeighbours(it) }.filter { rows[it.Y][it.X] != 9 }
+        return if (next.size == current.size) current
         else getBasin(next)
     }
 
@@ -44,7 +44,7 @@ class Grid(private val rows: List<List<Int>>) {
 
 
 fun main() {
-    val rows = File("src/main/kotlin/day09/input_test.txt")
+    val rows = File("src/main/kotlin/day09/input.txt")
         .readLines()
         .map { line -> line.map { Character.getNumericValue(it) } }
 
