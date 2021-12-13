@@ -1,5 +1,6 @@
 package day11
 
+import shared.Coordinate
 import java.io.File
 
 fun main() {
@@ -53,16 +54,12 @@ class OctopusGrid(private val rows: List<List<Int>>, val cumulativeFlashCount: I
     }
 
     private fun getNeighbours(coordinate: Coordinate): List<Coordinate> {
-        return listOf(
-            coordinate.up(),
-            coordinate.upLeft(),
-            coordinate.upRight(),
-            coordinate.down(),
-            coordinate.downLeft(),
-            coordinate.downRight(),
-            coordinate.left(),
-            coordinate.right()
-        ).filter { !isOutOfBounds(it) }
+        return (-1..1).flatMap{x ->
+            (-1..1).map{y ->
+                coordinate.plus(Coordinate(x,y))
+            }
+        }.filter{it != coordinate}
+        .filter { !isOutOfBounds(it) }
     }
 
     private fun isOutOfBounds(coordinate: Coordinate): Boolean {
@@ -70,15 +67,4 @@ class OctopusGrid(private val rows: List<List<Int>>, val cumulativeFlashCount: I
     }
 
     fun allFlashes(): Boolean = rows.sumOf { it.sum() } == 0
-}
-
-data class Coordinate(val X: Int, val Y: Int) {
-    fun up(): Coordinate = Coordinate(X, Y - 1)
-    fun upLeft(): Coordinate = Coordinate(X - 1, Y - 1)
-    fun upRight(): Coordinate = Coordinate(X + 1, Y - 1)
-    fun down(): Coordinate = Coordinate(X, Y + 1)
-    fun downLeft(): Coordinate = Coordinate(X - 1, Y + 1)
-    fun downRight(): Coordinate = Coordinate(X + 1, Y + 1)
-    fun right(): Coordinate = Coordinate(X + 1, Y)
-    fun left(): Coordinate = Coordinate(X - 1, Y)
 }

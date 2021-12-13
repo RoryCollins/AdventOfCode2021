@@ -3,7 +3,6 @@ package day10
 import java.io.File
 
 fun main() {
-
     val parsedLines = File("src/main/kotlin/day10/input.txt")
         .readLines()
         .map { parse(it) }
@@ -16,7 +15,6 @@ fun main() {
         .sorted()
         .median()}")
 }
-
 
 private fun parse(line: String): Pair<Boolean, String> {
     val closureIndex = line.indexOfFirst { pairs.values.contains(it) }

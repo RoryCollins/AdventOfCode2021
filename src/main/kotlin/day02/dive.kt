@@ -1,5 +1,6 @@
 package day02
 
+import shared.Coordinate
 import java.io.File
 
 val instructions = File("src/main/kotlin/day02/input.txt")
@@ -7,7 +8,6 @@ val instructions = File("src/main/kotlin/day02/input.txt")
     .map { it.split(" ") }
     .map { it.first() to it.last().toInt() }
 
-data class Coordinate(val X: Int, val Y: Int)
 data class State(val Coordinate: Coordinate, val Aim: Int)
 
 fun parseInstruction(instruction: Pair<String, Int>, current: State): State {

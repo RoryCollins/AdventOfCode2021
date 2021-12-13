@@ -1,13 +1,7 @@
 package day09
 
+import shared.Coordinate
 import java.io.File
-
-data class Coordinate(val X: Int, val Y: Int) {
-    fun up(): Coordinate = Coordinate(X, Y - 1)
-    fun down(): Coordinate = Coordinate(X, Y + 1)
-    fun right(): Coordinate = Coordinate(X + 1, Y)
-    fun left(): Coordinate = Coordinate(X - 1, Y)
-}
 
 class HeightMap(private val rows: List<List<Int>>) {
     private val lowPoints = rows.indices.flatMap { y ->
@@ -30,18 +24,18 @@ class HeightMap(private val rows: List<List<Int>>) {
 
     private fun getNeighbours(coordinate: Coordinate): List<Coordinate> {
         return listOf(
-            coordinate.up(),
-            coordinate.down(),
-            coordinate.left(),
-            coordinate.right()
-        ).filter { !isOutOfBounds(it) }
+            Coordinate(0,1),
+            Coordinate(0,-1),
+            Coordinate(1,0),
+            Coordinate(-1,0)
+        ).map { it.plus(coordinate) }
+            .filter { !isOutOfBounds(it) }
     }
 
     private fun isOutOfBounds(coordinate: Coordinate): Boolean {
         return coordinate.X < 0 || coordinate.Y < 0 || coordinate.X >= rows.first().size || coordinate.Y >= rows.size
     }
 }
-
 
 fun main() {
     val rows = File("src/main/kotlin/day09/input.txt")
