@@ -2,7 +2,6 @@ package day13
 
 import java.io.File
 
-
 data class Coordinate(val X: Int, val Y: Int)
 
 fun main(){
@@ -22,7 +21,7 @@ fun main(){
 
     println("Part One: ${fold(coordinates, foldInstructions[0].first, foldInstructions[0].second.toInt()).size}")
     println("Part Two:")
-    val newCoordinates =foldInstructions.fold(coordinates) { ps, f -> fold(ps, f.first, f.second.toInt())}
+    val newCoordinates =foldInstructions.fold(coordinates) { nextCoordinates, instruction -> fold(nextCoordinates, instruction.first, instruction.second.toInt())}
     val maxX = newCoordinates.maxOf { it.X }
     val maxY = newCoordinates.maxOf { it.Y }
     (0 .. maxY).map{ y ->
