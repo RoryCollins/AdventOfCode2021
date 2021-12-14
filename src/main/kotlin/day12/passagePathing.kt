@@ -44,9 +44,10 @@ fun createPaths(
     currentPath: List<String>
 ): Int {
     if (currentLocation == "end") return 1
-    val availableLocations = connectionMap[currentLocation]!!
-        .filter { it != "start" }
-        .filter { availabilityDeterminant(connectionMap, it, currentPath) }
+    val availableLocations = connectionMap[currentLocation]
+        ?.filter { it != "start" }
+        ?.filter { availabilityDeterminant(connectionMap, it, currentPath) }
+        ?: error("$currentLocation not found in map!")
     if (availableLocations.isEmpty()) return 0
     return availableLocations.sumOf { createPaths(connectionMap, availabilityDeterminant, it, currentPath + it) }
 }

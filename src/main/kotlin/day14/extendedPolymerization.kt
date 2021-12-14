@@ -13,11 +13,8 @@ fun main() {
         .map { pair -> pair.split(" -> ") }
         .associate { it.first() to it.last() }
 
-    val tenStepPolymerComposition = getPolymerComposition(pairInsertionRules, polymerTemplate, 10)
-    val fortyStepPolymerComposition = getPolymerComposition(pairInsertionRules, polymerTemplate, 40)
-
-    println("Part One: ${score(tenStepPolymerComposition)}")
-    println("Part Two: ${score(fortyStepPolymerComposition)}")
+    println("Part One: ${score(getPolymerComposition(pairInsertionRules, polymerTemplate, 10))}")
+    println("Part Two: ${score(getPolymerComposition(pairInsertionRules, polymerTemplate, 40))}")
 }
 
 fun getPolymerComposition(rules: Map<String, String>, polymerSequence: String, steps: Int): Map<Char, Long> {
@@ -42,7 +39,7 @@ fun getPolymerComposition(rules: Map<String, String>, polymerSequence: String, s
 fun insertElements(rules: Map<String, String>, current: Map<String, Long>): Map<String, Long>{
     val next = mutableMapOf<String, Long>()
     current.map {
-        val first = it.key.first()+rules[it.key]!!
+        val first = it.key.first()+ rules[it.key]!!
         val second = rules[it.key]!! + it.key.last()
         next[first] = next.getOrDefault(first, 0) + it.value
         next[second] = next.getOrDefault(second, 0) + it.value
