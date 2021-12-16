@@ -21,12 +21,12 @@ class Cave(private val rows: List<List<Int>>) : Grid(rows) {
     fun dijkstraMinimum(): Int {
         val priorityQueue = PriorityQueue(CoordinateScoreComparator())
         val visited = mutableSetOf<Coordinate>()
-        val totalRisk = mutableMapOf<Coordinate, Int>()
+        val cumulativeRiskMap = mutableMapOf<Coordinate, Int>()
 
         val origin = Coordinate(0, 0)
         val end = Coordinate(rows.first().size-1, rows.size-1)
 
-        totalRisk[origin] = 0
+        cumulativeRiskMap[origin] = 0
         priorityQueue.add(CoordinateScore(origin, 0))
 
         while(priorityQueue.isNotEmpty()){
@@ -35,13 +35,13 @@ class Cave(private val rows: List<List<Int>>) : Grid(rows) {
 
             getNeighbours(coordinate).filter{!visited.contains(it)}.map{
                 val newRiskLevel = risk + rows[it.y][it.x]
-                if(newRiskLevel < totalRisk.getOrDefault(it, Int.MAX_VALUE)){
-                    totalRisk[it] = newRiskLevel
+                if(newRiskLevel < cumulativeRiskMap.getOrDefault(it, Int.MAX_VALUE)){
+                    cumulativeRiskMap[it] = newRiskLevel
                     priorityQueue.add(CoordinateScore(it, newRiskLevel))
                 }
             }
         }
-        return totalRisk.getOrDefault(end, Int.MAX_VALUE)
+        return cumulativeRiskMap.getOrDefault(end, Int.MAX_VALUE)
     }
 
     fun extend(): Cave {
