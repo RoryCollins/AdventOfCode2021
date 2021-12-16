@@ -19,7 +19,7 @@ fun main() {
 
 class Cave(private val rows: List<List<Int>>) : Grid(rows) {
     fun dijkstraMinimum(): Int {
-        val priorityQueue = PriorityQueue(CoordinateDistanceComparator())
+        val priorityQueue = PriorityQueue(CoordinateScoreComparator())
         val visited = mutableSetOf<Coordinate>()
         val totalRisk = mutableMapOf<Coordinate, Int>()
 
@@ -54,9 +54,8 @@ class Cave(private val rows: List<List<Int>>) : Grid(rows) {
     }
 }
 
-private class CoordinateDistanceComparator : Comparator<CoordinateScore>{
+private class CoordinateScoreComparator : Comparator<CoordinateScore>{
     override fun compare(first: CoordinateScore, second: CoordinateScore): Int {
         return first.score.compareTo(second.score)
     }
 }
-
