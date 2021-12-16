@@ -1,6 +1,7 @@
 package day02
 
 import shared.Coordinate
+import shared.CoordinateScore
 import java.io.File
 
 val instructions = File("src/main/kotlin/day02/input.txt")
@@ -8,23 +9,22 @@ val instructions = File("src/main/kotlin/day02/input.txt")
     .map { it.split(" ") }
     .map { it.first() to it.last().toInt() }
 
-data class State(val Coordinate: Coordinate, val Aim: Int)
 
-fun parseInstruction(instruction: Pair<String, Int>, current: State): State {
+fun parseInstruction(instruction: Pair<String, Int>, current: CoordinateScore): CoordinateScore {
     val (direction, distance) = instruction
     return when (direction) {
-        "forward" -> State(
-            Coordinate(current.Coordinate.X + distance, current.Coordinate.Y + (current.Aim * distance)),
-            current.Aim
+        "forward" -> CoordinateScore(
+            Coordinate(current.coordinate.x + distance, current.coordinate.y + (current.score * distance)),
+            current.score
         )
-        "up" -> State( current.Coordinate, current.Aim - distance )
-        "down" -> State( current.Coordinate, current.Aim + distance )
+        "up" -> CoordinateScore( current.coordinate, current.score - distance )
+        "down" -> CoordinateScore( current.coordinate, current.score + distance )
         else -> throw IllegalArgumentException(direction)
     }
 }
 
 fun main() {
     val destination =
-        instructions.fold(State(Coordinate(0, 0), 0)) { current, instruction -> parseInstruction(instruction, current) }
-    println(destination.Coordinate.X * destination.Coordinate.Y)
+        instructions.fold(CoordinateScore(Coordinate(0, 0), 0)) { current, instruction -> parseInstruction(instruction, current) }
+    println(destination.coordinate.x * destination.coordinate.y)
 }

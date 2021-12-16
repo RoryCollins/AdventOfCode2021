@@ -1,72 +1,62 @@
 package day15
 
 import shared.Coordinate
+import shared.CoordinateScore
+import shared.Grid
 import java.io.File
+import java.util.*
+import kotlin.Comparator
 
 fun main() {
-    val grid = Grid(File("src/main/kotlin/day15/input_test.txt")
+    val cave = Cave(File("src/main/kotlin/day15/input.txt")
         .readLines()
         .map { line -> line.map { Character.getNumericValue(it) } })
 
-    println("Part One: ${grid.getMinimumRisk()}")
-    println("Part Two: ${grid.toBigGrid().getMinimumRisk()}")
-
-    grid.toBigGrid().print()
-    grid.dijkstraMinimum().print()
+    println("Part One: ${cave.dijkstraMinimum()}")
+    println("Part Two: ${cave.extend().dijkstraMinimum()}")
 }
 
 
-class Grid(private val rows: List<List<Int>>) {
-    private val numberOfDiagonals = (rows.size - 1) * 2
+class Cave(private val rows: List<List<Int>>) : Grid(rows) {
+    fun dijkstraMinimum(): Int {
+        val priorityQueue = PriorityQueue(CoordinateDistanceComparator())
+        val visited = mutableSetOf<Coordinate>()
+        val totalRisk = mutableMapOf<Coordinate, Int>()
 
-    fun print() {
-        rows.map { println(it.joinToString("")) }
-    }
+        val origin = Coordinate(0, 0)
+        val end = Coordinate(rows.first().size-1, rows.size-1)
 
-    fun getMinimumRisk(): Int {
-        val x: MutableList<MutableList<Int>> = rows.map { it.toMutableList() }.toMutableList()
-        (1..numberOfDiagonals).map { diagonal ->
-            coordinatesAlongDiagonal(diagonal).map {
-                val costs = listOf(Coordinate(-1, 0), Coordinate(0, -1))
-                    .map { f -> it.plus(f) }
-                    .filter { f -> !isOutOfBounds(f) }
+        totalRisk[origin] = 0
+        priorityQueue.add(CoordinateScore(origin, 0))
 
-                x[it.Y][it.X] = costs.minOf { c -> x[c.Y][c.X] } + x[it.Y][it.X]
+        while(priorityQueue.isNotEmpty()){
+            val (coordinate, risk) = priorityQueue.remove()
+            visited.add(coordinate)
+
+            getNeighbours(coordinate).filter{!visited.contains(it)}.map{
+                val newRiskLevel = risk + rows[it.y][it.x]
+                if(newRiskLevel < totalRisk.getOrDefault(it, Int.MAX_VALUE)){
+                    totalRisk[it] = newRiskLevel
+                    priorityQueue.add(CoordinateScore(it, newRiskLevel))
+                }
             }
         }
-        return x[rows.size - 1][rows.first().size - 1] - x[0][0]
+        return totalRisk.getOrDefault(end, Int.MAX_VALUE)
     }
 
-    fun dijkstraMinimum(): Grid {
-
-        val x: MutableList<MutableList<Int>> = (0..rows.size).map { mutableListOf(rows.first().size, Int.MAX_VALUE) }.toMutableList()
-        x[0][0] = 0
-        return Grid(x)
-    }
-
-    fun getNeighbours(coordinate: Coordinate): List<Coordinate>{
-        return listOf(
-            Coordinate(0,1),
-            Coordinate(0,-1),
-            Coordinate(1,0),
-            Coordinate(-1,0)).map{coordinate.plus(it)}
-            .filter{!isOutOfBounds(it)}
-    }
-
-    private fun isOutOfBounds(f: Coordinate): Boolean {
-        return f.X < 0 || f.Y < 0 || f.X >= rows.first().size || f.Y >= rows.size
-    }
-
-    private fun coordinatesAlongDiagonal(n: Int): List<Coordinate> {
-        return (0..n).map { x -> Coordinate(x, n - x) }.filter { !isOutOfBounds(it) }
-    }
-
-    fun toBigGrid(): Grid {
-        val newRows = (0..5).flatMap { yIndex ->
+    fun extend(): Cave {
+        val newRows = (0..4).flatMap { yIndex ->
             rows.map { row ->
                 List(5){row}.flatMapIndexed{xIndex, r -> r.map { if(it + yIndex + xIndex > 9) (it + yIndex + xIndex - 9) else (it + yIndex + xIndex) }}
             }
         }
-        return Grid(newRows)
+        return Cave(newRows)
     }
 }
+
+private class CoordinateDistanceComparator : Comparator<CoordinateScore>{
+    override fun compare(first: CoordinateScore, second: CoordinateScore): Int {
+        return first.score.compareTo(second.score)
+    }
+}
+

@@ -1,6 +1,7 @@
 package day11
 
 import shared.Coordinate
+import shared.Grid
 import java.io.File
 
 fun main() {
@@ -21,11 +22,7 @@ fun findAllFlashes(octopusGrid: OctopusGrid, steps: Int): Int{
     else findAllFlashes(octopusGrid.getNext(), steps+1)
 }
 
-class OctopusGrid(private val rows: List<List<Int>>, val cumulativeFlashCount: Int) {
-    fun print() {
-        rows.map{ println(it) }
-    }
-
+class OctopusGrid(private val rows: List<List<Int>>, val cumulativeFlashCount: Int) : Grid(rows) {
     fun getNext(): OctopusGrid {
         return incrementAllValues().incrementFlasherNeighbours()
     }
@@ -41,8 +38,8 @@ class OctopusGrid(private val rows: List<List<Int>>, val cumulativeFlashCount: I
         do  {
             readyToFlash.map{
                 flashes++
-                nextRows[it.Y][it.X] = 0
-                getNeighbours(it).filter{nextRows[it.Y][it.X] != 0}.map {n -> nextRows[n.Y][n.X] += 1 }
+                nextRows[it.y][it.x] = 0
+                getNeighbours(it).filter{nextRows[it.y][it.x] != 0}.map { n -> nextRows[n.y][n.x] += 1 }
             }
             readyToFlash = OctopusGrid(nextRows, flashes).flashingOctopodes()
         }while(readyToFlash.isNotEmpty())
@@ -53,17 +50,8 @@ class OctopusGrid(private val rows: List<List<Int>>, val cumulativeFlashCount: I
         return rows.indices.flatMap { y -> rows.first().indices.filter{x -> rows[y][x] >= 10}.map{x -> Coordinate(x, y)} }
     }
 
-    private fun getNeighbours(coordinate: Coordinate): List<Coordinate> {
-        return (-1..1).flatMap{x ->
-            (-1..1).map{y ->
-                coordinate.plus(Coordinate(x,y))
-            }
-        }.filter{it != coordinate}
-        .filter { !isOutOfBounds(it) }
-    }
-
-    private fun isOutOfBounds(coordinate: Coordinate): Boolean {
-        return coordinate.X < 0 || coordinate.Y < 0 || coordinate.X >= rows.first().size || coordinate.Y >= rows.size
+    override fun getNeighbours(coordinate: Coordinate): List<Coordinate> {
+        return getAdjacentNeighbours(coordinate) + getDiagonalNeighbours(coordinate)
     }
 
     fun allFlashes(): Boolean = rows.sumOf { it.sum() } == 0

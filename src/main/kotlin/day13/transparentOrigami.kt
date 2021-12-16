@@ -29,8 +29,8 @@ fun main() {
             instruction.second.toInt()
         )
     }
-    (0..newCoordinates.maxOf { it.Y }).map { y ->
-        (0..newCoordinates.maxOf { it.X }).map { x ->
+    (0..newCoordinates.maxOf { it.y }).map { y ->
+        (0..newCoordinates.maxOf { it.x }).map { x ->
             print(if (newCoordinates.contains(Coordinate(x, y))) "█" else " ")
         }
         print("\n")
@@ -39,6 +39,6 @@ fun main() {
 
 fun fold(coordinates: Set<Coordinate>, axis: String, value: Int): Set<Coordinate> {
     return if (axis == "y")
-        coordinates.map { if (it.Y <= value) it else Coordinate(it.X, value - (it.Y - value)) }.toSet()
-    else coordinates.map { if (it.X <= value) it else Coordinate(value - (it.X - value), it.Y) }.toSet()
+        coordinates.map { if (it.y <= value) it else Coordinate(it.x, value - (it.y - value)) }.toSet()
+    else coordinates.map { if (it.x <= value) it else Coordinate(value - (it.x - value), it.y) }.toSet()
 }
