@@ -1,7 +1,7 @@
 package day16
 
-import com.sun.javafx.scene.control.skin.IntegerFieldSkin
 import java.io.File
+import kotlin.system.measureNanoTime
 
 fun main() {
     val input = File("src/main/kotlin/day16/input.txt")
@@ -10,6 +10,7 @@ fun main() {
 
     val (packet, remaining) = Packet.parse(input)
     println("Part One: ${packet.getVersionTotals()}")
+    println("Part Two: ${packet.getValue()}")
 }
 
 data class Metadata(val version: Int, val type: Int)
@@ -21,19 +22,20 @@ fun getMetadata(binary: String): Pair<Metadata, String>{
 }
 
 abstract class Packet(val version: Int) {
-    abstract fun getVersionTotals(): Int;
+    abstract fun getVersionTotals(): Int
+    abstract fun getValue(): Long
     companion object {
         fun parse(binary: String) : Pair<Packet, String>{
             val (metadata, remaining) = getMetadata(binary)
                 return when (metadata.type) {
                     4 -> LiteralPacket.create(metadata.version, remaining)
-                    else -> OperatorPacket.create(metadata.version, remaining)
+                    else -> OperatorPacket.create(metadata, remaining)
                 }
         }
     }
 }
 
-class LiteralPacket(version: Int, val value: Long) : Packet(version) {
+class LiteralPacket(version: Int, private val value: Long) : Packet(version) {
     companion object {
         fun create(version: Int, binary: String): Pair<LiteralPacket, String>{
             val (value, remaining) = getValue(binary, "")
@@ -51,14 +53,19 @@ class LiteralPacket(version: Int, val value: Long) : Packet(version) {
     override fun getVersionTotals(): Int {
         return version
     }
+
+    override fun getValue(): Long {
+        return value
+    }
 }
 
-class OperatorPacket(version: Int, private val contents: List<Packet>) : Packet(version) {
+class OperatorPacket(private val metadata: Metadata, private val contents: List<Packet>) : Packet(metadata.version) {
+
 
     companion object{
-        fun create(version: Int, binary: String): Pair<OperatorPacket, String>{
+        fun create(metadata: Metadata, binary: String): Pair<OperatorPacket, String>{
             val (packets, remaining) = getContents(binary)
-            return OperatorPacket(version, packets) to remaining
+            return OperatorPacket(metadata, packets) to remaining
         }
         private fun getContents(binary: String): Pair<List<Packet>, String>{
             return when(binary.first()){
@@ -92,5 +99,17 @@ class OperatorPacket(version: Int, private val contents: List<Packet>) : Packet(
 
     override fun getVersionTotals(): Int {
         return version + contents.sumOf { it.getVersionTotals() }
+    }
+
+    override fun getValue(): Long {
+        return when(metadata.type){
+            0 -> contents.sumOf { it.getValue() }
+            1 -> contents.fold(1L){acc, packet -> packet.getValue() * acc}
+            2 -> contents.minOf { it.getValue() }
+            3 -> contents.maxOf { it.getValue() }
+            5 -> if(contents.first().getValue()>contents.last().getValue()) 1 else 0
+            6 -> if(contents.first().getValue()<contents.last().getValue()) 1 else 0
+            else -> if(contents.first().getValue()==contents.last().getValue()) 1 else 0
+        }
     }
 }
