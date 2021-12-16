@@ -60,8 +60,6 @@ class LiteralPacket(version: Int, private val value: Long) : Packet(version) {
 }
 
 class OperatorPacket(private val metadata: Metadata, private val contents: List<Packet>) : Packet(metadata.version) {
-
-
     companion object{
         fun create(metadata: Metadata, binary: String): Pair<OperatorPacket, String>{
             val (packets, remaining) = getContents(binary)
