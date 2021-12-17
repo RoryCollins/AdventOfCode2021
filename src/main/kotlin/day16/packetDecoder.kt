@@ -1,14 +1,13 @@
 package day16
 
 import java.io.File
-import kotlin.system.measureNanoTime
 
 fun main() {
     val input = File("src/main/kotlin/day16/input.txt")
         .readText()
         .map { Integer.toBinaryString(Integer.parseInt(it.toString(), 16)) }.joinToString("") { it.padStart(4, '0') }
 
-    val (packet, remaining) = Packet.parse(input)
+    val (packet, _) = Packet.parse(input)
     println("Part One: ${packet.getVersionTotals()}")
     println("Part Two: ${packet.getValue()}")
 }
@@ -21,25 +20,25 @@ fun getMetadata(binary: String): Pair<Metadata, String>{
     return Metadata(version, type) to binary.drop(6)
 }
 
-abstract class Packet(val version: Int) {
+abstract class Packet(val metadata: Metadata) {
     abstract fun getVersionTotals(): Int
     abstract fun getValue(): Long
     companion object {
         fun parse(binary: String) : Pair<Packet, String>{
             val (metadata, remaining) = getMetadata(binary)
                 return when (metadata.type) {
-                    4 -> LiteralPacket.create(metadata.version, remaining)
+                    4 -> LiteralPacket.create(metadata, remaining)
                     else -> OperatorPacket.create(metadata, remaining)
                 }
         }
     }
 }
 
-class LiteralPacket(version: Int, private val value: Long) : Packet(version) {
+class LiteralPacket(metadata: Metadata, private val value: Long) : Packet(metadata) {
     companion object {
-        fun create(version: Int, binary: String): Pair<LiteralPacket, String>{
+        fun create(metadata: Metadata, binary: String): Pair<LiteralPacket, String>{
             val (value, remaining) = getValue(binary, "")
-            return LiteralPacket(version, value) to remaining
+            return LiteralPacket(metadata, value) to remaining
         }
         fun getValue(binary: String, cumulativeValueString: String): Pair<Long, String>{
             val valuePart = binary.drop(1).take(4)
@@ -51,7 +50,7 @@ class LiteralPacket(version: Int, private val value: Long) : Packet(version) {
     }
 
     override fun getVersionTotals(): Int {
-        return version
+        return metadata.version
     }
 
     override fun getValue(): Long {
@@ -59,7 +58,7 @@ class LiteralPacket(version: Int, private val value: Long) : Packet(version) {
     }
 }
 
-class OperatorPacket(private val metadata: Metadata, private val contents: List<Packet>) : Packet(metadata.version) {
+class OperatorPacket(metadata: Metadata, private val contents: List<Packet>) : Packet(metadata) {
     companion object{
         fun create(metadata: Metadata, binary: String): Pair<OperatorPacket, String>{
             val (packets, remaining) = getContents(binary)
@@ -76,7 +75,7 @@ class OperatorPacket(private val metadata: Metadata, private val contents: List<
             val length = Integer.parseInt(binary.take(15), 2)
             var remaining = binary.drop(15).take(length)
             while(remaining.isNotEmpty()){
-                val (packet, next) = Packet.parse(remaining)
+                val (packet, next) = parse(remaining)
                 packets.add(packet)
                 remaining = next
             }
@@ -87,7 +86,7 @@ class OperatorPacket(private val metadata: Metadata, private val contents: List<
             val count = Integer.parseInt(binary.take(11), 2)
             var remaining = binary.drop(11)
             while (packets.size < count){
-                val (packet, next) = Packet.parse(remaining)
+                val (packet, next) = parse(remaining)
                 packets.add(packet)
                 remaining = next
             }
@@ -96,7 +95,7 @@ class OperatorPacket(private val metadata: Metadata, private val contents: List<
     }
 
     override fun getVersionTotals(): Int {
-        return version + contents.sumOf { it.getVersionTotals() }
+        return metadata.version + contents.sumOf { it.getVersionTotals() }
     }
 
     override fun getValue(): Long {
