@@ -10,7 +10,7 @@ internal class TrickShotTest {
 
     @Test
     fun solve() {
-        val testInput = File("src/main/kotlin/day17/input_test.txt").readText()
+        val testInput = File("test/main/kotlin/day17/input.txt").readText()
         assertEquals(Solution(45, 112), solve(testInput))
     }
 }
